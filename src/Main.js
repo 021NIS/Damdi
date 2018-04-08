@@ -7,8 +7,11 @@ import {
   Alert,
   StyleSheet
 } from 'react-native';
-import { auth } from 'firebase';
+import { auth, database } from 'firebase';
 import { NavigationActions } from 'react-navigation';
+import { MapView } from 'expo';
+
+const { Marker } = MapView;
 
 class Main extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -27,18 +30,47 @@ class Main extends Component {
   };
 
   state = {
-    isLoading: false
+    isLoading: false,
+    places: [],
+    region: {
+      latitude: 43.237342,
+      longitude: 76.915418,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421
+    }
   };
 
   componentDidMount() {
     this.props.navigation.setParams({
       handleProfile: () => this.moveToProfile()
     });
+    this.loadData();
   }
+
+  loadData = async () => {
+    try {
+      this.setState({ isLoading: true });
+      const snapshot = await database()
+        .ref('places')
+        .once('value');
+      this.setState({ isLoading: false });
+      const places = Object.values(snapshot.val());
+      this.setState({ places });
+    } catch (error) {
+      this.setState({ isLoading: false });
+      Alert.alert('Ошибка', error.message, [{ text: 'OK' }], {
+        cancelable: false
+      });
+    }
+  };
 
   moveToProfile = () => {
     const { navigate } = this.props.navigation;
     navigate('Profile');
+  };
+
+  moveToPlaceView = place => {
+    console.log(place);
   };
 
   signOut = async () => {
@@ -65,9 +97,18 @@ class Main extends Component {
       </View>
     ) : (
       <View style={styles.container}>
-        <TouchableOpacity onPress={this.signOut}>
-          <Text>Выйти</Text>
-        </TouchableOpacity>
+        <MapView region={this.state.region} style={styles.map}>
+          {this.state.places.map(place => (
+            <Marker
+              coordinate={place.location}
+              title={place.name}
+              description={place.description}
+              onCalloutPress={() => {
+                this.moveToPlaceView(place);
+              }}
+            />
+          ))}
+        </MapView>
       </View>
     );
   }
@@ -90,6 +131,9 @@ const styles = StyleSheet.create({
   headerRightText: {
     fontSize: 18,
     color: 'black'
+  },
+  map: {
+    flex: 1
   }
 });
 
