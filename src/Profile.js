@@ -146,14 +146,14 @@ class Profile extends Component {
           value={this.state.email}
           placeholder="Email"
           style={styles.textInput}
-          underlineColorAndroid="#98c807"
+          underlineColorAndroid={'transparent'}
           onChange={this.onEmailChange}
         />
         <TextInput
           value={this.state.password}
           placeholder="Пароль"
           style={styles.textInput}
-          underlineColorAndroid="#98c807"
+          underlineColorAndroid={'transparent'}
           onChange={this.onPasswordChange}
           secureTextEntry
         />
@@ -204,7 +204,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     marginTop: 20,
-    width: '100%'
+    width: '100%',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#98c807',
+    borderRadius: 8
   },
   primaryButton: {
     marginTop: 20,
