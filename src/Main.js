@@ -7,8 +7,7 @@ import {
   Alert,
   StyleSheet
 } from 'react-native';
-import { auth, database } from 'firebase';
-import { NavigationActions } from 'react-navigation';
+import { database } from 'firebase';
 import { MapView } from 'expo';
 
 const { Marker } = MapView;
@@ -54,7 +53,10 @@ class Main extends Component {
         .ref('places')
         .once('value');
       this.setState({ isLoading: false });
-      const places = Object.values(snapshot.val());
+      const places = Object.entries(snapshot.val()).map(item => ({
+        id: item[0],
+        ...item[1]
+      }));
       this.setState({ places });
     } catch (error) {
       this.setState({ isLoading: false });
@@ -69,25 +71,12 @@ class Main extends Component {
     navigate('Profile');
   };
 
-  moveToPlaceView = place => {
+  moveToPlace = place => {
     console.log(place);
-  };
-
-  signOut = async () => {
-    const { dispatch } = this.props.navigation;
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      key: null,
-      actions: [NavigationActions.navigate({ routeName: 'Start' })]
+    const { navigate } = this.props.navigation;
+    navigate('Place', {
+      place
     });
-    try {
-      await auth().signOut();
-      dispatch(resetAction);
-    } catch (error) {
-      Alert.alert('Ошибка', error.toString(), [{ text: 'OK' }], {
-        cancelable: false
-      });
-    }
   };
 
   render() {
@@ -104,7 +93,7 @@ class Main extends Component {
               title={place.name}
               description={place.description}
               onCalloutPress={() => {
-                this.moveToPlaceView(place);
+                this.moveToPlace(place);
               }}
             />
           ))}

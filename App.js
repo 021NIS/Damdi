@@ -5,6 +5,7 @@ import SignIn from './src/SignIn';
 import SignUp from './src/SignUp';
 import Main from './src/Main';
 import Profile from './src/Profile';
+import Place from './src/Place';
 
 const config = {
   apiKey: 'AIzaSyDMPaxV07cZ6iJygjxi_ggawsgK-Pu9cPc',
@@ -30,7 +31,8 @@ const AuthStack = StackNavigator(
 const MainStack = StackNavigator(
   {
     Main: { screen: Main },
-    Profile: { screen: Profile }
+    Profile: { screen: Profile },
+    Place: { screen: Place }
   },
   {
     headerMode: 'none'
